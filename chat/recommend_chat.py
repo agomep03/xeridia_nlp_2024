@@ -28,8 +28,10 @@ class RecommendChat:
         - Canciones relacionadas.
         - Si el usuario lo menciona explícitamente, recomendaciones de podcasts relevantes.
 
-        Cada apartado debe estar encabezado por los puntos anteriores.
-        Por favor, no incluyas ninguna introducción ni conclusión como "Aquí tienes recomendaciones" o "Si deseas más información". Solo proporciona las recomendaciones en un formato claro y directo. No repitas el mensaje del usuario ni incluyas texto innecesario.
+        Cada apartado debe estar encabezado por los puntos anteriores en caso de que se mencione el artista. Si no se menciona o el usuario no sabe
+        que escuchar los apartados los puedes poner como quieras.
+        Por favor, no incluyas ninguna introducción ni conclusión como "Aquí tienes recomendaciones" o "Si deseas más información".
+        Solo proporciona las recomendaciones en un formato claro y directo. No repitas el mensaje del usuario ni incluyas texto innecesario.
 
         Si no hay recomendaciones directas, ofrece opciones generales basadas en géneros similares.
         """
