@@ -6,7 +6,9 @@ API_LOCATION = "eastus"
 API_MODEL_MINI = "gpt-4o-mini"
 API_MODEL = "gpt-4o"
 
+#Token del bot de Discord
 TOKEN_BOT = "MTMxMTk2MDAyNDU4NjkxNTg1MQ.GfklIE.-vBFrzIY3eRqrPgKy1IgKWF7nbNUaiuERLzVJY"
 
+#Credenciales Spotify
 CLIENT_ID = "89424652df7748a5a97f5ab9ea4a3207"
 CLIENT_SECRET = "f34c28ee35974387beb5d05b9cb8c98c"

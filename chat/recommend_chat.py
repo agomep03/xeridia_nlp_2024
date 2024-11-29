@@ -51,8 +51,7 @@ class RecommendChat:
 
             response = chat_completion.choices[0].message.content
 
-            # Imprimir la respuesta generada
-            print(response)
+            return response
 
         except Exception as e:
             return f"Hubo un error al generar las recomendaciones: {str(e)}"
