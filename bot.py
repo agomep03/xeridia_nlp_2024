@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from apis.spotify_api import get_popular_songs
 import config
+from lyricsgenius import Genius
 
 from chat.recommend_chat import RecommendChat 
 from chat.playlist_chat import PlaylistChat
@@ -80,7 +81,7 @@ async def consult(ctx, *, message: str):
 
 #Funcion para vaciar la conversacion
 @bot.command()
-async def clean(ctx):
+async def clear(ctx):
     # Elimina los últimos 100 mensajes en el canal
     deleted = await ctx.channel.purge(limit=100)
     # Envia el mensajey  lo borra después de 3 segundos
