@@ -2,11 +2,11 @@ import discord
 from discord.ext import commands
 from apis.spotify_api import get_popular_songs
 import config
-from lyricsgenius import Genius
 
 from chat.recommend_chat import RecommendChat 
 from chat.playlist_chat import PlaylistChat
 from chat.consult_chat import ConsultantChat
+from chat.review_chat import ReviewChat
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -17,6 +17,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 recommend_chat = RecommendChat()
 playlist_chat = PlaylistChat()
 consult_chat = ConsultantChat()
+review_chat = ReviewChat()
 
 #Funcion para comprobar que el bot está conectado
 @bot.event
@@ -77,6 +78,20 @@ async def consult(ctx, *, message: str):
     
     except Exception as e:
         await ctx.send(f"Hubo un error al responder la pregunta: {str(e)}")
+
+
+@bot.command()
+async def review(ctx, *, message: str):
+    """Evalúa una reseña escrita por el usuario y devuelve una calificación en estrellas."""
+    try:
+        # Llamar al método receive_message de la clase ReviewChat para evaluar la reseña
+        rating = review_chat.receive_message(message)
+
+        # Enviar la calificación al canal
+        await ctx.send(f"La reseña ha sido calificada con: {rating} estrellas")
+    
+    except Exception as e:
+        await ctx.send(f"Hubo un error al evaluar la reseña: {str(e)}")
 
 
 #Funcion para vaciar la conversacion
