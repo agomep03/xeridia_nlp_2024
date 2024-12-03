@@ -1,42 +1,21 @@
-# TODO: start bot
-
-#Conect with discord
-
-#Comect spotify api in discord
-
-#init: prompt_classifier, recommend_chat, consult_chat, playlist_chat
-
-#For each message in discord:
-    #process input
-
-    #case recommend:
-        #recommend_chat.receive_message()
-
-    #case consult:
-        #consult_chat.receive_message()
-
-    #case create playlist:
-        #playlist_chat.receive_message()
-        #spotify.createPlaylist(message[0])
-        #message=message[1]
-
-    #discord.output(message)
-
-
 import discord
 from discord.ext import commands
 from apis.spotify_api import get_popular_songs
 import config
 
 from chat.recommend_chat import RecommendChat 
+from chat.playlist_chat import PlaylistChat
+from chat.consult_chat import ConsultantChat
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Instancia de la clase RecommendChat
+# Creamos las instancias
 recommend_chat = RecommendChat()
+playlist_chat = PlaylistChat()
+consult_chat = ConsultantChat()
 
 #Funcion para comprobar que el bot está conectado
 @bot.event
@@ -45,7 +24,7 @@ async def on_ready():
 
 
 @bot.command()
-async def playlist(ctx):
+async def topSongs(ctx):
     canciones = get_popular_songs()
     await ctx.send("Canciones populares:\n" + "\n".join(canciones))
 
@@ -61,6 +40,42 @@ async def recommend(ctx, *, message: str):
     
     except Exception as e:
         await ctx.send(f"Hubo un error al obtener las recomendaciones: {str(e)}")
+
+
+@bot.command()
+async def playlist(ctx, *, message: str):
+    """Genera una playlist basada en los gustos o estado de ánimo del usuario."""
+    try:
+        # Llamar al método receive_message de la clase PlaylistChat
+        playlist_data = playlist_chat.receive_message(message)
+        
+        # Enviar la respuesta formateada
+        description = playlist_data.get("description", "Sin descripción.")
+        title = playlist_data.get("title", "Título no disponible.")
+        songs = playlist_data.get("list", [])
+        
+        if songs:
+            song_list = "\n".join(songs)
+            await ctx.send(f"**{title}**\n{description}\n\n**Canciones**:\n{song_list}")
+        else:
+            await ctx.send(f"**{title}**\n{description}\n\nNo se encontraron canciones para esta playlist.")
+    
+    except Exception as e:
+        await ctx.send(f"Hubo un error al generar la playlist: {str(e)}")
+
+
+@bot.command()
+async def consult(ctx, *, message: str):
+    """Responde preguntas relacionadas con música, artistas, géneros, etc."""
+    try:
+        # Llamar al método receive_message de la clase ConsultantChat
+        response = consult_chat.receive_message(message)
+        
+        # Enviar la respuesta al canal
+        await ctx.send(response)
+    
+    except Exception as e:
+        await ctx.send(f"Hubo un error al responder la pregunta: {str(e)}")
 
 
 #Funcion para vaciar la conversacion
