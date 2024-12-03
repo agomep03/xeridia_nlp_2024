@@ -5,6 +5,7 @@ import config
 
 from chat.recommend_chat import RecommendChat 
 from chat.playlist_chat import PlaylistChat
+from chat.consult_chat import ConsultantChat
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -14,6 +15,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 # Creamos las instancias
 recommend_chat = RecommendChat()
 playlist_chat = PlaylistChat()
+consult_chat = ConsultantChat()
 
 #Funcion para comprobar que el bot está conectado
 @bot.event
@@ -60,6 +62,20 @@ async def playlist(ctx, *, message: str):
     
     except Exception as e:
         await ctx.send(f"Hubo un error al generar la playlist: {str(e)}")
+
+
+@bot.command()
+async def consult(ctx, *, message: str):
+    """Responde preguntas relacionadas con música, artistas, géneros, etc."""
+    try:
+        # Llamar al método receive_message de la clase ConsultantChat
+        response = consult_chat.receive_message(message)
+        
+        # Enviar la respuesta al canal
+        await ctx.send(response)
+    
+    except Exception as e:
+        await ctx.send(f"Hubo un error al responder la pregunta: {str(e)}")
 
 
 #Funcion para vaciar la conversacion
