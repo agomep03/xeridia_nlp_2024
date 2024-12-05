@@ -95,12 +95,35 @@ def get_top_artists():
     except Exception as e:
         return {"error": str(e)}
 
-#Check If User Follows Artists or Users
+def get_playlists(query, limit=2, property='id'):
+    """
+    Obtiene playlists según una query.
+    """
+    if not sp:
+        return ["Error: Spotify no está configurado correctamente."]
+    
+    resultados = sp.search(q=query, type='playlist', limit=limit)
+    playlists = [playlist[property] for playlist in resultados['playlists']['items'] if playlist is not None ]
+    return playlists
 
-#Check User's Saved Tracks
+def get_playlists_items(playlist_id, limit=10, property='id'):
+    """
+    Obtiene las canciones en una playlist
+    """
+    if not sp:
+        return ["Error: Spotify no está configurado correctamente."]
+    
+    resultados = sp.playlist_tracks(playlist_id=playlist_id, limit=limit)
+    songs = [song['track'][property] for song in resultados['items'] if song is not None ]
+    return songs
 
-#Search for Item
+
+
+#Get song, with property='name' (it will also be authors, album...)
+
 
 #Create Playlist
 
-#Get playlist Items
+#Check If User Follows Artists or Users
+
+#Check User's Saved Tracks
