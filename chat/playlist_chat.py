@@ -49,7 +49,9 @@ class PlaylistChat:
         keywords = keywords.split(" ")
 
         # Add sentimient
-        #keywords.append(self.sentiment.analyze_sentiment(message=message)["Estado de ánimo"])
+        sentiment = self.sentiment.analyze_sentiment(message=message)
+        if 'Estado de ánimo' in sentiment:
+            keywords.append(sentiment['Estado de ánimo'])
 
         # Create songs lists
         numberSongsInPlaylist=20
@@ -75,7 +77,6 @@ class PlaylistChat:
             newKeywords = keywords.copy()
             random.shuffle(newKeywords)
             newKeywords = newKeywords[:lenNewKeywords]
-            print(newKeywords)
             query = " ".join(newKeywords)
             
             playlists = get_playlists(query, limit=2, property='id')
