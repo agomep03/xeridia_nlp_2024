@@ -117,9 +117,24 @@ def get_playlists_items(playlist_id, limit=10, property='id'):
     songs = [song['track'][property] for song in resultados['items'] if song is not None ]
     return songs
 
+def get_song(song_id):
+    """
+    Obtiene una propiedad de una playlist dado su id
+    """
+    if not sp:
+        return ["Error: Spotify no está configurado correctamente."]
+    
+    resultados = sp.track(track_id=song_id)
+    return resultados
+    
+def song_save_by_user(song_id):
+    """
+    Obtiene si el usuario tiene guardada una canción o no
+    """
+    if not sp_user:
+        return ["Error: La cuenta de spotify no está configurada correctamente."]
+    sp_user.current_user_saved_tracks_contains(tracks=song_id)
 
-
-#Get song, with property='name' (it will also be authors, album...)
 
 
 #Create Playlist
