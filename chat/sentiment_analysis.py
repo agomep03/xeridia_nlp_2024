@@ -1,5 +1,7 @@
 from transformers import pipeline
 
+
+# Utiliza NLP pero principalmente utiliza un diccionario de palabras clave (más exacto)
 class SentimentAnalysis:
     def __init__(self):
         """
