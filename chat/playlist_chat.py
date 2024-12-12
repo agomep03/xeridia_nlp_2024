@@ -5,7 +5,8 @@ from openai import AzureOpenAI
 from config import AZURE_OPENAI_API_KEY, API_VERSION, API_ENDPOINT, API_MODEL_MINI, API_MODEL
 
 from utils.process_text import extract_keywords
-from apis.spotify_api import get_playlists, get_playlists_items, get_song, song_save_by_user
+from apis.spotify_api import get_playlists, get_playlists_items, get_song, song_save_by_user, artist_followed_by_user, create_playlist
+from chat.sentiment_analysis2 import SentimentAnalysis2
 
 def delete_duplicate_songs(songs):
     return list(dict.fromkeys(songs))
@@ -38,6 +39,7 @@ class PlaylistChat:
                             "[DESCRIPTION]: <descripción general de la playlist>. "
                             "[TITLEPLAYLIST]: <título de la playlist>. "
                             "[PLAYLIST]: <canción 1>, <canción 2>, <canción 3>, ..."}
+        self.sentiment = SentimentAnalysis2()
     
     
 
@@ -46,28 +48,22 @@ class PlaylistChat:
         keywords = extract_keywords(message)
         keywords = keywords.split(" ")
 
-        #TODO Add to keywords the user preferences (ej: pop)
-        #TODO Add to keywords the sentimient of message 
+        # Add sentimient
+        #keywords.append(self.sentiment.analyze_sentiment(message=message)["Estado de ánimo"])
 
         # Create songs lists
-        numberSongsInPlaylist=2
+        numberSongsInPlaylist=20
         indexOfSearch = 3
 
         searchSongs = self.search_songs(keywords,numberSongsInPlaylist*indexOfSearch)
-        songsNames = self.songs_names(searchSongs)
-        print(songsNames)
         songs = self.select_songs(searchSongs, numberSongsInPlaylist)
-        print(songs)
         songsNames = self.songs_names(songs)
-        print(songsNames)
 
-        #TODO Create playlist
-        #create_spotify_playlist(songs)
-
-
-        # Create response to user
         prompt="El usuario ha pedido: "+message+" Se le ha creado una playlist con las canciones: "+" ,".join(songsNames)
         response = self.create_response(prompt)
+
+        create_playlist(songs=songs, title=response['title'], description=response['description'])
+
         return response
 
     
@@ -79,6 +75,7 @@ class PlaylistChat:
             newKeywords = keywords.copy()
             random.shuffle(newKeywords)
             newKeywords = newKeywords[:lenNewKeywords]
+            print(newKeywords)
             query = " ".join(newKeywords)
             
             playlists = get_playlists(query, limit=2, property='id')
@@ -101,8 +98,6 @@ class PlaylistChat:
         for song in songs:
             puntuations.append([song, self.get_puntuation(song)])
         
-        print(puntuations)
-
         sortedSongs = sorted(puntuations, key=lambda x:x[1], reverse=True)
 
         filterSongs = [x[0] for x in sortedSongs[:numberSongsInPlaylist]]
@@ -120,20 +115,18 @@ class PlaylistChat:
 
     def get_puntuation(self, songId):
         puntuation = 0
-        #TODO give puntuation
 
-        puntuation += 100*song_save_by_user(songId)
-        #puntuation += 10*artist_follow_by_user(songID)
-        puntuation += get_song(song_id=songId)["popularity"]
+        try:
+            puntuation += 100*song_save_by_user(songId)
+            song = get_song(songId)
+            if song is not None:
+                puntuation += 100*artist_followed_by_user(song['artists'][0]['id'])
+                puntuation += song["popularity"]
+        except:
+            puntuation = -100
 
         return puntuation
 
-
-
-    def create_spotify_playlist(self, songs):
-        for song in songs:
-            #TODO spotify.create_playlist(songs)
-            pass
 
 
     def create_response(self, message):

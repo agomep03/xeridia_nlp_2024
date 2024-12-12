@@ -41,7 +41,7 @@ if credentials:
         client_id=client_id,
         client_secret=client_secret,
         redirect_uri=redirect_uri,
-        scope="user-read-private user-top-read playlist-read-private"
+        scope="user-read-private user-top-read playlist-read-private user-library-read user-follow-read playlist-modify-public playlist-modify-private"
     )
     sp_user = spotipy.Spotify(auth_manager=user_auth_manager)
 else:
@@ -114,7 +114,7 @@ def get_playlists_items(playlist_id, limit=10, property='id'):
         return ["Error: Spotify no está configurado correctamente."]
     
     resultados = sp.playlist_tracks(playlist_id=playlist_id, limit=limit)
-    songs = [song['track'][property] for song in resultados['items'] if song is not None ]
+    songs = [song['track'][property] for song in resultados['items'] if song is not None and song['track'] is not None]
     return songs
 
 def get_song(song_id):
@@ -133,12 +133,27 @@ def song_save_by_user(song_id):
     """
     if not sp_user:
         return ["Error: La cuenta de spotify no está configurada correctamente."]
-    sp_user.current_user_saved_tracks_contains(tracks=song_id)
+    
+    return sp_user.current_user_saved_tracks_contains(tracks=[song_id])[0]
 
+def artist_followed_by_user(artist_id):
+    """
+    Obtiene si el usuario sigue a un artista o no
+    """
+    if not sp_user:
+        return ["Error: La cuenta de spotify no está configurada correctamente."]
+    
+    return sp_user.current_user_following_artists(ids=[artist_id])[0]
 
+def create_playlist(songs, title, description):
+    """
+    Crea una playlist
+    """
 
-#Create Playlist
+    if not sp_user:
+        return ["Error: La cuenta de spotify no está configurada correctamente."]
+    
+    playlist = sp_user.user_playlist_create(user=sp_user.current_user()['id'],name=title, description=description)
+    sp_user.playlist_add_items(playlist['id'], songs)
 
-#Check If User Follows Artists or Users
-
-#Check User's Saved Tracks
+    return 0
