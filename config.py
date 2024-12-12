@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+import json
 
 AZURE_OPENAI_API_KEY = "7MoKzuuPAla0Cl3RYSM2aHjTAmkVopeVC4VhHCCdLPGDbAg0Vk4OJQQJ99AKACYeBjFXJ3w3AAABACOGrjrr"
 API_VERSION = "2024-10-01-preview"
@@ -12,10 +13,18 @@ API_MODEL = "gpt-4o"
 #Token del bot de Discord
 TOKEN_BOT = "MTMxMTk2MDAyNDU4NjkxNTg1MQ.GfklIE.-vBFrzIY3eRqrPgKy1IgKWF7nbNUaiuERLzVJY"
 
-#Credenciales Spotify
-CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
-CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
+# Ruta del archivo JSON con las credenciales
+CREDENTIALS_FILE = "spotify_credentials.json"
+
+# Leer credenciales desde el archivo JSON
+if os.path.exists(CREDENTIALS_FILE):
+    with open(CREDENTIALS_FILE, "r") as file:
+        credentials = json.load(file)
+    CLIENT_ID = credentials.get("SPOTIFY_CLIENT_ID")
+    CLIENT_SECRET = credentials.get("SPOTIFY_CLIENT_SECRET")
+    REDIRECT_URI = credentials.get("SPOTIFY_REDIRECT_URI")
+else:
+    raise FileNotFoundError(f"El archivo {CREDENTIALS_FILE} no existe. Por favor, verifica su ubicación.")
 
 #Token de Genius
 TOKEN_GENIUS = "I7SU1zO8Rlc7mAuJJcyAuYxuHoj65nM_MBUwftLS8pPY3oEfwr5xjrqgFGG_y0PN"
