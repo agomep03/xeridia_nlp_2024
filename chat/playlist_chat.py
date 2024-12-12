@@ -5,7 +5,7 @@ from openai import AzureOpenAI
 from config import AZURE_OPENAI_API_KEY, API_VERSION, API_ENDPOINT, API_MODEL_MINI, API_MODEL
 
 from utils.process_text import extract_keywords
-from apis.spotify_api import get_playlists, get_playlists_items, get_user_followed_artists
+from apis.spotify_api import get_playlists, get_playlists_items, get_song, song_save_by_user
 
 def delete_duplicate_songs(songs):
     return list(dict.fromkeys(songs))
@@ -54,16 +54,19 @@ class PlaylistChat:
         indexOfSearch = 3
 
         searchSongs = self.search_songs(keywords,numberSongsInPlaylist*indexOfSearch)
+        songsNames = self.songs_names(searchSongs)
+        print(songsNames)
         songs = self.select_songs(searchSongs, numberSongsInPlaylist)
-
+        print(songs)
         songsNames = self.songs_names(songs)
+        print(songsNames)
 
         #TODO Create playlist
         #create_spotify_playlist(songs)
 
 
         # Create response to user
-        prompt="El usuario ha pedido: "+message+" Se le ha creado una playlist con las canciones: "+" ,".join(songs)
+        prompt="El usuario ha pedido: "+message+" Se le ha creado una playlist con las canciones: "+" ,".join(songsNames)
         response = self.create_response(prompt)
         return response
 
@@ -85,7 +88,6 @@ class PlaylistChat:
                 songs += obtainSongs
             
             songs = delete_duplicate_songs(songs)
-            print(songs)
 
         return songs
 
@@ -98,30 +100,31 @@ class PlaylistChat:
 
         for song in songs:
             puntuations.append([song, self.get_puntuation(song)])
-
+        
         print(puntuations)
 
         sortedSongs = sorted(puntuations, key=lambda x:x[1], reverse=True)
 
-        print(sortedSongs)
-
         filterSongs = [x[0] for x in sortedSongs[:numberSongsInPlaylist]]
-
-        print(filterSongs)
 
         return filterSongs
 
     def songs_names(self, songs):
-        return None
+        songsNames = []
+        for song_id in songs:
+            newSong = get_song(song_id)
+            if newSong is not None:
+                songsNames.append(newSong['name'])
+        return songsNames
 
 
-    def get_puntuation(self, song):
-        puntuation = len(song)
+    def get_puntuation(self, songId):
+        puntuation = 0
         #TODO give puntuation
 
-        #puntuation += 10*song_save_by_user(songID)
+        puntuation += 100*song_save_by_user(songId)
         #puntuation += 10*artist_follow_by_user(songID)
-        #puntuation += song_popularity(songID)
+        puntuation += get_song(song_id=songId)["popularity"]
 
         return puntuation
 
