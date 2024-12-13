@@ -2,7 +2,12 @@ import joblib
 import os
 from sentence_transformers import SentenceTransformer
 from sklearn.base import BaseEstimator, TransformerMixin
-"""from song_lyrics import SongLyricsFetcher"""
+
+from chat.recommend_chat import RecommendChat 
+from chat.playlist_chat import PlaylistChat
+from chat.consult_chat import ConsultantChat
+from chat.review_chat import ReviewChat
+from chat.song_lyrics import SongLyricsFetcher
 
 class SentenceTransformerWrapper(BaseEstimator, TransformerMixin):
     def __init__(self, model_name='all-MiniLM-L6-v2'):
@@ -21,7 +26,7 @@ class PromptClassifier:
         self.pipeline = joblib.load('process_input/modelos_v2/pipeline_model_v2.pkl')
 
         self.dictionary = {
-            "artista": 0,
+            "recomendaciones":0,
             "consultar_informacion": 1,
             "crear_playlist": 2,
             "resena": 3,
@@ -45,30 +50,46 @@ class PromptClassifier:
         print("Predicciones:", predictions)
         return predictions[0]
 
-    def handle_prediction(self, prediction, text):
+    async def handle_prediction(self, prediction, text, message):
         """
         Maneja las acciones basadas en la predicción.
 
         Args:
             prediction (int): Índice de la predicción.
             text (str): Consulta introducida por el usuario.
+            message: El mensaje original recibido del usuario.
         """
-        if prediction == 0:
-            print("artista")
-        
+
+        if prediction == 0:  # Si la predicción es para recomendaciones
+            print("Generando recomendaciones musicales...") 
+            recommend_chat = RecommendChat()
+            recommendations = recommend_chat.receive_message(text)
+            return recommendations
+    
         elif prediction == 1:
-            print("consultar_informacion")
+            print("Buscando información sobre...") 
+            consult_chat = ConsultantChat()
+            response = consult_chat.receive_message(text)  # Procesa la consulta sobre el artista
+            return response
 
         elif prediction == 2:
-            print("crear_playlist")
+            print("Generando una playlist...") 
+            playlist_chat = PlaylistChat()
+            playlist_data = playlist_chat.receive_message(text)
+            return playlist_data
 
         elif prediction == 3:
-            print("Reseñas")
-
+            print("Analizando reseña...") 
+            review_chat = ReviewChat()
+            rating = review_chat.receive_message(text)
+            return rating
+        
         elif prediction == 4:
-            print("Letras")
-            """chat2 = SongLyricsFetcher()
-            chat2.get_lyrics([text])"""
+            print("Buscando la letra de la canción...") 
+            lyrics_fetcher = SongLyricsFetcher()
+            lyrics = lyrics_fetcher.get_lyrics([text])
+            return lyrics
+
 
     def run(self):
         """

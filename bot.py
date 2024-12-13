@@ -55,22 +55,23 @@ async def on_message(message):
 
     # Comprobamos si el usuario ya ha respondido
     if message.author.id in user_responses:
-
         # Procesar el mensaje con la clase PromptClassifier
         prediction = prompt_classifier.classify_prompt(message.content)  # Clasificar el mensaje
-        prompt_classifier.handle_prediction(prediction, message.content)  # Manejar la predicción
 
         # Opcional: responder al usuario según la acción
         if prediction == 0:
-            await message.channel.send("Procesando información sobre un artista...")
+            await message.channel.send("Generando recomendaciones musicales...")
         elif prediction == 1:
-            await message.channel.send("Consultando información...")
+            await message.channel.send("Buscando información sobre...")
         elif prediction == 2:
             await message.channel.send("Generando una playlist...")
         elif prediction == 3:
             await message.channel.send("Analizando reseña...")
         elif prediction == 4:
-            await message.channel.send("Buscando letras de canciones...")
+            await message.channel.send("Buscando la letra de la canción...")
+
+        respuesta = await prompt_classifier.handle_prediction(prediction, message.content, message)  # Manejar la predicción
+        await message.channel.send(respuesta)
 
     else:
         # Si el mensaje es "sí" o "no", registramos la respuesta

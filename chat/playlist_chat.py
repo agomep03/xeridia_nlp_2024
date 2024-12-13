@@ -63,6 +63,7 @@ class PlaylistChat:
 
         prompt="El usuario ha pedido: "+message+" Se le ha creado una playlist con las canciones: "+" ,".join(songsNames)
         response = self.create_response(prompt)
+        print(response)
 
         create_playlist(songs=songs, title=response['title'], description=response['description'])
 
