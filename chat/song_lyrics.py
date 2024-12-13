@@ -6,13 +6,12 @@ from config import AZURE_OPENAI_API_KEY, API_VERSION, API_ENDPOINT, TOKEN_GENIUS
 class SongLyricsFetcher:
     
     def __init__(self):
-        # Iniciamos el cliente de OpenAI
         self.client = AzureOpenAI(
             api_version=API_VERSION,
             azure_endpoint=API_ENDPOINT,
             api_key=AZURE_OPENAI_API_KEY
         )
-        # Iniciamos el cliente de Genius con el token
+
         self.genius = Genius(TOKEN_GENIUS)
     
     def extract_song_info(self, message):
@@ -38,7 +37,6 @@ class SongLyricsFetcher:
         Frase: <frase de la canción o 'Desconocido'>
         """
         try:
-            # Llamada a la API de Azure OpenAI
             chat_completion = self.client.chat.completions.create(
                 model=API_MODEL,
                 messages=[
@@ -49,14 +47,11 @@ class SongLyricsFetcher:
                 temperature=0.7,
             )
 
-            # Obtener el contenido de la respuesta
             response = chat_completion.choices[0].message.content.strip()
-            print("Respuesta de OpenAI:\n", response)  # Verificar el formato
+            print("Respuesta de OpenAI:\n", response)
 
-            # Inicializamos los valores como 'Desconocido'
             artist, song, phrase = "Desconocido", "Desconocido", "Desconocido"
 
-            # Ajustar las expresiones regulares para extraer la información
             artist_match = re.search(r"Artista:\s*(.+)", response)
             song_match = re.search(r"Canción:\s*(.+)", response)
             phrase_match = re.search(r"Frase:\s*(.+)", response)
@@ -68,7 +63,7 @@ class SongLyricsFetcher:
             if phrase_match:
                 phrase = phrase_match.group(1).strip()
 
-            print(f"Artista: {artist}, Canción: {song}, Frase: {phrase}")  # Verificar los valores extraídos
+            print(f"Artista: {artist}, Canción: {song}, Frase: {phrase}")
             return artist, song, phrase
 
         except Exception as e:
@@ -159,7 +154,6 @@ class SongLyricsFetcher:
         """
         artist, song, phrase = self.extract_song_info(message)
         
-        # Verificamos si todos los datos son "Desconocido"
         if artist == "Desconocido" and song == "Desconocido" and phrase == "Desconocido":
             return "No se pudo extraer la información del mensaje."
 

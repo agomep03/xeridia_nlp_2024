@@ -16,7 +16,7 @@ class RecommendChat:
         self.sentiment_analyzer = SentimentAnalysis()
 
     def receive_message(self, message):
-        recommendation = self.recommend(message)  # Se llama a la función recomendadora
+        recommendation = self.recommend(message)
         return recommendation
 
     def recommend(self, message):
@@ -39,7 +39,6 @@ class RecommendChat:
         """
 
         try:
-            # Se llama a la API de OpenAI para obtener recomendaciones
             chat_completion = self.client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
@@ -134,7 +133,6 @@ class RecommendChat:
         :return: Una lista de canciones relacionadas con el estado de ánimo.
         """
         try:
-            # Analiza el estado de ánimo
             mood = self.sentiment_analyzer.analyze_sentiment(message)
 
             prompt = f"""
