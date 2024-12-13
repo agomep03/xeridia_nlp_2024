@@ -18,7 +18,7 @@ class SentenceTransformerWrapper(BaseEstimator, TransformerMixin):
 class PromptClassifier:
     def __init__(self):
         """Inicializa la clase cargando el pipeline de clasificación y el diccionario."""
-        self.pipeline = joblib.load('process_input/pipeline_model.pkl')
+        self.pipeline = joblib.load('process_input/modelos_v2/pipeline_model_v2.pkl')
 
         self.dictionary = {
             "artista": 0,
@@ -65,8 +65,9 @@ class PromptClassifier:
         elif prediction == 3:
             print("Reseñas")
 
-        """elif prediction == 4:
-            chat2 = SongLyricsFetcher()
+        elif prediction == 4:
+            print("Letras")
+            """chat2 = SongLyricsFetcher()
             chat2.get_lyrics([text])"""
 
     def run(self):
