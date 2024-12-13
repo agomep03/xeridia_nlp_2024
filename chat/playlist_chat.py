@@ -6,7 +6,7 @@ from config import AZURE_OPENAI_API_KEY, API_VERSION, API_ENDPOINT, API_MODEL_MI
 
 from utils.process_text import extract_keywords
 from apis.spotify_api import get_playlists, get_playlists_items, get_song, song_save_by_user, artist_followed_by_user, create_playlist
-from chat.sentiment_analysis2 import SentimentAnalysis2
+from chat.sentiment_analysis import SentimentAnalysis
 
 def delete_duplicate_songs(songs):
     return list(dict.fromkeys(songs))
@@ -39,7 +39,7 @@ class PlaylistChat:
                             "[DESCRIPTION]: <descripción general de la playlist>. "
                             "[TITLEPLAYLIST]: <título de la playlist>. "
                             "[PLAYLIST]: <canción 1>, <canción 2>, <canción 3>, ..."}
-        self.sentiment = SentimentAnalysis2()
+        self.sentiment = SentimentAnalysis()
     
     
 
