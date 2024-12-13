@@ -1,16 +1,31 @@
 import joblib
 import os
-from song_lyrics import SongLyricsFetcher
+from sentence_transformers import SentenceTransformer
+from sklearn.base import BaseEstimator, TransformerMixin
+"""from song_lyrics import SongLyricsFetcher"""
+
+class SentenceTransformerWrapper(BaseEstimator, TransformerMixin):
+    def __init__(self, model_name='all-MiniLM-L6-v2'):
+        self.embedder = SentenceTransformer(model_name)
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return self.embedder.encode(X, show_progress_bar=False)
+    
 
 class PromptClassifier:
     def __init__(self):
         """Inicializa la clase cargando el pipeline de clasificación y el diccionario."""
-        self.pipeline = joblib.load('../process_input/text_classification_pipeline.pkl')
+        self.pipeline = joblib.load('process_input/pipeline_model.pkl')
 
         self.dictionary = {
             "artista": 0,
             "consultar_informacion": 1,
-            "crear_playlist": 2
+            "crear_playlist": 2,
+            "resena": 3,
+            "letra": 4
         }
 
         print("Pipeline cargado correctamente.")
@@ -25,7 +40,7 @@ class PromptClassifier:
         Returns:
             int: Índice de la predicción.
         """
-
+        
         predictions = self.pipeline.predict([text])
         print("Predicciones:", predictions)
         return predictions[0]
@@ -38,7 +53,6 @@ class PromptClassifier:
             prediction (int): Índice de la predicción.
             text (str): Consulta introducida por el usuario.
         """
-
         if prediction == 0:
             print("artista")
         
@@ -51,15 +65,14 @@ class PromptClassifier:
         elif prediction == 3:
             print("Reseñas")
 
-        elif prediction == 4:
+        """elif prediction == 4:
             chat2 = SongLyricsFetcher()
-            chat2.get_lyrics([text])
+            chat2.get_lyrics([text])"""
 
     def run(self):
         """
         Punto de entrada principal para ejecutar la clasificación de prompt.
         """
-        
         print(f"Directorio actual: {os.getcwd()}")
         text = input("Introduzca su consulta:\n")
         prediction = self.classify_prompt(text)
