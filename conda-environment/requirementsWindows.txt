@@ -45,3 +45,5 @@ pandas==2.2.3
 transformers==4.45.2
 torch==2.3.1
 tf-keras==2.18.0
+scikit-learn==1.5.2
+sentence-transformers==3.3.1
