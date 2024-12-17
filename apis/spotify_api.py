@@ -149,7 +149,12 @@ def create_playlist(songs, title, description):
     """
     Crea una playlist
     """
+    if not isinstance(title,str) or len(title)<1:
+        title = "Nueva playlist"
 
+    if not isinstance(description,str) or len(description)<1:
+        description = ""
+        
     if not sp_user:
         return ["Error: La cuenta de spotify no está configurada correctamente."]
     

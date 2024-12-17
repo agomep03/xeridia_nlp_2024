@@ -91,12 +91,10 @@ class PlaylistChat:
     
     def search_songs(self, keywords, numberSongsToSearch=60):
         songs = []
-        lenNewKeywords = len(keywords)//2
 
         while len(songs) < numberSongsToSearch:
             newKeywords = keywords.copy()
             random.shuffle(newKeywords)
-            newKeywords = newKeywords[:lenNewKeywords]
             query = " ".join(newKeywords)
             
             playlists = get_playlists(query, limit=2, property='id')
