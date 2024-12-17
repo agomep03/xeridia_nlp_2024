@@ -58,6 +58,7 @@ async def on_message(message):
         # Procesar el mensaje con la clase PromptClassifier
         prediction = prompt_classifier.classify_prompt(message.content)  # Clasificar el mensaje
 
+        '''
         # Opcional: responder al usuario según la acción
         if prediction == 0:
             await message.channel.send("Generando recomendaciones musicales...")
@@ -69,6 +70,7 @@ async def on_message(message):
             await message.channel.send("Analizando reseña...")
         elif prediction == 4:
             await message.channel.send("Buscando la letra de la canción...")
+        '''
 
         respuesta = await prompt_classifier.handle_prediction(prediction, message.content, message)  # Manejar la predicción
         await message.channel.send(respuesta)
@@ -86,6 +88,7 @@ async def on_message(message):
             user_in_config[message.author.id] = True  # Marcar que está en configuración
             await message.channel.send(f"{message.author.mention}, por favor ve a https://developer.spotify.com/dashboard/applications (recomendamos usarlo en Google Chrome) para obtener tus claves. Una vez dentro, sigue las instrucciones que te he enviado por privado.")
             await info_credential(message)
+            await logIn(message)  # Llamamos a la función para manejar el logins
 
         else:
             await message.channel.send("Por favor, responde con 'sí' o 'no'.")
@@ -135,15 +138,15 @@ async def logIn(message):
     try:
         # Preguntar por el CLIENT_ID
         await message.channel.send("¿Cuál es tu SPOTIFY_CLIENT_ID?")
-        client_id = await bot.wait_for('message', check=check, timeout=60.0)
+        client_id = await bot.wait_for('message', check=check, timeout=3600.0)
         
         # Preguntar por el CLIENT_SECRET
         await message.channel.send("¿Cuál es tu SPOTIFY_CLIENT_SECRET?")
-        client_secret = await bot.wait_for('message', check=check, timeout=60.0)
+        client_secret = await bot.wait_for('message', check=check, timeout=3600.0)
 
         # Preguntar por el REDIRECT_URI
         await message.channel.send("¿Cuál es tu SPOTIFY_REDIRECT_URI?")
-        redirect_uri = await bot.wait_for('message', check=check, timeout=60.0)
+        redirect_uri = await bot.wait_for('message', check=check, timeout=3600.0)
 
         # Guardar las credenciales en un archivo JSON
         credentials = {
@@ -163,13 +166,10 @@ async def logIn(message):
 
         # Aquí puedes continuar con la lógica después de guardar las credenciales
         await message.channel.send("¡Credenciales de Spotify guardadas con éxito!")
-        await message.channel.send("Estoy preparado para ayudarte en lo que necesites")
+        await message.channel.send("Estoy preparado para ayudarte en lo que necesites.")
         
-        # Después de guardar las credenciales, podrías permitir que el bot clasifique otros mensajes o ejecutar nuevas acciones.
-        await message.channel.send("Puedes empezar a interactuar con el bot. ¿En qué te puedo ayudar ahora?")
-
     except Exception as e:
-        await message.channel.send(f"Hubo un error al configurar las credenciales: {str(e)}")
+        await message.channel.send(f"Hubo un error al configurar las credenciales. {str(e)}")
 
 
 # Ruta del archivo para guardar credenciales

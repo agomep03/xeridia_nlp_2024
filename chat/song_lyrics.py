@@ -81,24 +81,6 @@ class SongLyricsFetcher:
             print("Error al procesar el mensaje:", str(e))
             return "Error", "Desconocido", f"Hubo un error al procesar el mensaje: {str(e)}"
 
-    def fetch_song_lyrics(self, artist, song, phrase):
-        """
-        Usa la API de Genius para obtener la letra de la canción considerando todos los casos:
-        """
-        try:
-            if not artist or not song:
-                return "Por favor, proporciona tanto el artista como la canción."
-
-            print(f"Buscando la letra de '{song}' de '{artist}'...")
-            song_data = self.genius.search_song(song, artist)
-
-            if song_data:
-                return song_data.lyrics
-            else:
-                return f"No se encontró la canción '{song}' de '{artist}'."
-
-        except Exception as e:
-            return f"Hubo un error al obtener la letra: {str(e)}"
 
     def get_lyrics(self, message):
         """
@@ -110,13 +92,11 @@ class SongLyricsFetcher:
             return "No se pudo extraer la información del mensaje."
 
         lyrics = self.get_song_url(
-            artist if artist != "Desconocido" else "" +
-            song if song != "Desconocido" else "" +
+            artist+" " if artist != "Desconocido" else "" +
+            song+" " if song != "Desconocido" else "" +
             phrase if phrase != "Desconocido" else ""
         )
         return lyrics
-
-    import requests
 
     def get_song_url(self,message):
         headers = {'Authorization': f'Bearer {TOKEN_GENIUS}'}
