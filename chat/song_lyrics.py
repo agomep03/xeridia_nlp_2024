@@ -2,6 +2,7 @@ import re
 from openai import AzureOpenAI
 from lyricsgenius import Genius
 from config import AZURE_OPENAI_API_KEY, API_VERSION, API_ENDPOINT, TOKEN_GENIUS, API_MODEL
+import requests
 
 class SongLyricsFetcher:
     
@@ -108,9 +109,26 @@ class SongLyricsFetcher:
         if artist == "Desconocido" and song == "Desconocido":
             return "No se pudo extraer la información del mensaje."
 
-        lyrics = self.fetch_song_lyrics(
-            artist if artist != "Desconocido" else None,
-            song if song != "Desconocido" else None,
-            phrase if phrase != "Desconocido" else None
+        lyrics = self.get_song_url(
+            artist if artist != "Desconocido" else "" +
+            song if song != "Desconocido" else "" +
+            phrase if phrase != "Desconocido" else ""
         )
         return lyrics
+
+    import requests
+
+    def get_song_url(self,message):
+        headers = {'Authorization': f'Bearer {TOKEN_GENIUS}'}
+        url = "https://api.genius.com/search"
+        params = {'q': message}
+
+        response = requests.get(url, headers=headers, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+            song_path = data['response']['hits'][0]['result']['path']
+            song_url = f"https://genius.com{song_path}"
+            return song_url
+        else:
+            return f"Error en la solicitud: {response.status_code} - {response.text}"
