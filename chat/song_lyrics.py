@@ -12,7 +12,17 @@ class SongLyricsFetcher:
             api_key=AZURE_OPENAI_API_KEY
         )
 
-        self.genius = Genius(TOKEN_GENIUS)
+        # Configuración de Genius con un User-Agent actualizado
+        self.genius = Genius(
+            TOKEN_GENIUS,
+            timeout=15,
+            retries=3,
+            remove_section_headers=True,
+            verbose=True
+        )
+        self.genius._session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        })
     
     def extract_song_info(self, message):
         """
@@ -73,95 +83,34 @@ class SongLyricsFetcher:
     def fetch_song_lyrics(self, artist, song, phrase):
         """
         Usa la API de Genius para obtener la letra de la canción considerando todos los casos:
-        - Tenemos artista, canción y frase
-        - Tenemos artista y canción pero no frase
-        - Tenemos artista y frase pero no canción
-        - Tenemos artista pero no canción ni frase
-        - Tenemos canción y frase pero no artista
-        - Tenemos canción pero no frase ni artista
-        - Tenemos frase pero no artista ni canción
-        - No tenemos artista, ni canción ni frase
         """
         try:
-            # Caso 1: Tenemos artista, canción y frase
-            if artist and song and phrase:
-                song_data = self.genius.search_song(song, artist)
-                if song_data and phrase.lower() in song_data.lyrics.lower():
-                    return song_data.lyrics
-                else:
-                    return f"No se encontró la canción '{song}' del artista '{artist}' que contenga la frase '{phrase}'."
+            if not artist or not song:
+                return "Por favor, proporciona tanto el artista como la canción."
 
-            # Caso 2: Tenemos artista y canción, pero no frase
-            elif artist and song:
-                song_data = self.genius.search_song(song, artist)
-                if song_data:
-                    return song_data.lyrics
-                else:
-                    return f"No se encontró la canción '{song}' del artista '{artist}'."
+            print(f"Buscando la letra de '{song}' de '{artist}'...")
+            song_data = self.genius.search_song(song, artist)
 
-            # Caso 3: Tenemos artista y frase, pero no canción
-            elif artist and phrase:
-                search_result = self.genius.search_song(phrase, artist)
-                if search_result:
-                    return search_result.lyrics
-                else:
-                    return f"No se encontró ninguna canción de '{artist}' que contenga la frase '{phrase}'."
-
-            # Caso 4: Tenemos solo el artista
-            elif artist:
-                artist_data = self.genius.search_artist(artist, max_songs=3, sort="title")
-                if artist_data:
-                    return f"Se encontraron canciones del artista '{artist}':\n" + \
-                        "\n".join(song.title for song in artist_data.songs[:3])
-                else:
-                    return f"No se encontró el artista '{artist}'."
-
-            # Caso 5: Tenemos canción y frase, pero no artista
-            elif song and phrase:
-                search_result = self.genius.search_song(song)
-                if search_result and phrase.lower() in search_result.lyrics.lower():
-                    return search_result.lyrics
-                else:
-                    return f"No se encontró la canción '{song}' que contenga la frase '{phrase}'."
-
-            # Caso 6: Tenemos solo la canción
-            elif song:
-                search_result = self.genius.search_song(song)
-                if search_result:
-                    return search_result.lyrics
-                else:
-                    return f"No se encontró la canción '{song}'."
-
-            # Caso 7: Tenemos solo la frase
-            elif phrase:
-                search_result = self.genius.search_song(phrase)
-                if search_result:
-                    return search_result.lyrics
-                else:
-                    return f"No se encontró ninguna canción con la frase '{phrase}'."
-
-            # Caso 8: No tenemos artista, canción ni frase
+            if song_data:
+                return song_data.lyrics
             else:
-                return "No se ha proporcionado suficiente información para obtener la letra de la canción."
+                return f"No se encontró la canción '{song}' de '{artist}'."
 
         except Exception as e:
             return f"Hubo un error al obtener la letra: {str(e)}"
 
-    
     def get_lyrics(self, message):
         """
-        Esta función coordina el flujo: extrae la información y obtiene la letra.
+        Coordina el flujo: extrae la información y obtiene la letra.
         """
         artist, song, phrase = self.extract_song_info(message)
         
-        if artist == "Desconocido" and song == "Desconocido" and phrase == "Desconocido":
+        if artist == "Desconocido" and song == "Desconocido":
             return "No se pudo extraer la información del mensaje."
 
-        # Solo pasamos los parámetros relevantes a fetch_song_lyrics
-        lyrics = self.fetch_song_lyrics(artist if artist != "Desconocido" else None,
-                                        song if song != "Desconocido" else None,
-                                        phrase if phrase != "Desconocido" else None)
+        lyrics = self.fetch_song_lyrics(
+            artist if artist != "Desconocido" else None,
+            song if song != "Desconocido" else None,
+            phrase if phrase != "Desconocido" else None
+        )
         return lyrics
-
-
-

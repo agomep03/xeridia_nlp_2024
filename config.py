@@ -27,4 +27,4 @@ else:
     raise FileNotFoundError(f"El archivo {CREDENTIALS_FILE} no existe. Por favor, verifica su ubicación.")
 
 #Token de Genius
-TOKEN_GENIUS = "oThFM0mHc0HegQJDNGIOvgGN1VV_b-ccpaxWautvzKxKF4uVnQrbJU8fIx3-xcTq"
+TOKEN_GENIUS = "H7EMUDZVoAXwQ6anim8vYNktfmgj9OzSTo4Rxn-zryFG8ZuzdSge8qoNCOKrQe2N"
