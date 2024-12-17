@@ -87,7 +87,7 @@ class PromptClassifier:
         elif prediction == 4:
             print("Buscando la letra de la canción...") 
             lyrics_fetcher = SongLyricsFetcher()
-            lyrics = lyrics_fetcher.get_lyrics([text])
+            lyrics = lyrics_fetcher.get_lyrics(text)
             return lyrics
 
 
