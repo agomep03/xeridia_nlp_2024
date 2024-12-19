@@ -9,6 +9,8 @@ from chat.consult_chat import ConsultantChat
 from chat.review_chat import ReviewChat
 from chat.song_lyrics import SongLyricsFetcher
 
+from utils.rag import RAG
+
 class SentenceTransformerWrapper(BaseEstimator, TransformerMixin):
     def __init__(self, model_name='all-MiniLM-L6-v2'):
         self.embedder = SentenceTransformer(model_name)
@@ -32,6 +34,7 @@ class PromptClassifier:
             "resena": 3,
             "letra": 4
         }
+        self.rag=RAG()
 
         print("Pipeline cargado correctamente.")
 
@@ -59,10 +62,10 @@ class PromptClassifier:
             text (str): Consulta introducida por el usuario.
             message: El mensaje original recibido del usuario.
         """
-
+        
         if prediction == 0:  # Si la predicción es para recomendaciones
             print("Generando recomendaciones musicales...") 
-            recommend_chat = RecommendChat()
+            recommend_chat = RecommendChat(self.rag)
             recommendations = recommend_chat.receive_message(text)
             return recommendations
     
@@ -80,7 +83,7 @@ class PromptClassifier:
 
         elif prediction == 3:
             print("Analizando reseña...") 
-            review_chat = ReviewChat()
+            review_chat = ReviewChat(self.rag)
             rating = review_chat.receive_message(text)
             return rating
         
