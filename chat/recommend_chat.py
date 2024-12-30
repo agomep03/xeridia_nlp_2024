@@ -18,7 +18,7 @@ class RecommendChat:
         self.rag = rag
 
     def receive_message(self, message):
-        recommendation = self.recommend_with_rags(message)
+        recommendation = self.recommend(message)
         return recommendation
 
     def recommend(self, message):

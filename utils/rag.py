@@ -25,7 +25,10 @@ class RAG:
         :param top_k: Número de resultados a devolver.
         :return: Lista de diccionarios relevantes.
         """
-        query_embedding = self.model.encode([query])
-        distances, indices = self.index.search(query_embedding, top_k)
-        results = [self.metadata[i] for i in indices[0] if i < len(self.metadata)]
-        return results
+        try:
+            query_embedding = self.model.encode([query])
+            distances, indices = self.index.search(query_embedding, top_k)
+            results = [self.metadata[i] for i in indices[0] if i < len(self.metadata)]
+            return results
+        except:
+            return ""
